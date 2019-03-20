@@ -1,26 +1,30 @@
 <template>
     <!--header出口文件-->
-        <el-row :gutter="20" v-bind:gutter="25">
-            <el-col :span="6">
-                <geo></geo>
+    <div class="m-header">
+        <el-row>
+            <el-col>
+                <top-bar></top-bar>
             </el-col>
-            <el-col :span="6">
-                <user></user>
-            </el-col>
-            <el-col :span="6"><div class="grid-content bg-purple"></div></el-col>
         </el-row>
+        <el-row>
+            <el-col>
+                <search-bar></search-bar>
+            </el-col>
+        </el-row>
+    </div>
 </template>
 
 <script>
-import Geo from './geo'
-import User from './user'
+import topBar from './topbar'
+import searchBar from './searchbar'
 export default {
   components:{
-    Geo, User
+    topBar,
+    searchBar
   }
 }
 </script>
 
 <style lang="scss">
- @import "@/assets/css/public/layout.scss";
+    @import "@/assets/css/public/header/index.scss";
 </style>
