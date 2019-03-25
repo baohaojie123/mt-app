@@ -1,6 +1,6 @@
 <template>
   <section class="m-istyle">
-    <dl >
+    <dl @mouseover="over">
       <dt>有格调</dt>
       <dd
         :class="{active:kind==='all'}"
@@ -214,7 +214,14 @@ export default {
   },
 
   methods: {
-
+    over(e){
+        let dom = e.target
+        let tag = dom.tagName.toLowerCase()
+        let self = this
+        if (tag === 'dd') {
+            this.kind = dom.getAttribute('kind')
+        }
+    }
   },
 
 }
