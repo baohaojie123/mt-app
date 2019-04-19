@@ -22,17 +22,17 @@ export default {
       return 'jreahbaecujobfhe'
     },
     // 邮箱验证码
+    //toString转化为16进制，取第二位到6位 转换成大写
     get code(){
-      return ()=>{
-        //toString转化为16进制，取第二位到6位 转换成大写
+      // return ()=>{
         return Math.random().toString(16).slice(2,6).toUpperCase()
-      }
+      // }
     },
     //过期时间 一分钟
     get expire(){
-      return ()=>{
+      // return ()=>{
         return new Date().getTime()+60*60*1000
-      }
+      // }
     }
   }
 }

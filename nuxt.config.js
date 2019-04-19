@@ -44,8 +44,15 @@ module.exports = {
   ** Nuxt.js modules
   */
   modules: [
+    // register页面中 能self.$axios的原因  不用导入axios包 直接调用
+    // Doc: https://github.com/nuxt-community/axios-module#usage
+    '@nuxtjs/axios'
   ],
-
+  /*
+  ** Axios module configuration
+  */
+  axios: {
+  },
   /*
   ** Build configuration
   */

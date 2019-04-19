@@ -17,6 +17,19 @@ export default {
     return{
       user:''
     }
+  },
+  // 1
+  // mounted(){
+  //    // get()返回一个promise
+  //   this.$axios.get('/users/getUser').then()
+  // }
+  // 2
+  async mounted(){
+    // 解构赋值 status获取http响应状态的 数据结构是data部分 data里面的才是返回的内容
+    const {status,data:{user}} = await this.$axios.get('/users/getUser')
+    if(status === 200){
+      this.user = user
+    }
   }
 }
 </script>

@@ -44,46 +44,47 @@
             </el-form>
         </section>
     </div>
-    
+
 </template>
 
 <script>
+import CryptoJS from 'crypto-js'
 export default {
-  layout:'blank',
+  layout: 'blank',
   data() {
     return {
-      statusMsg:"",
-      error:'',
+      statusMsg: "",
+      error: '',
       form: {
         name: '',
         email: '',
         code: '',
-        pwd:'',
-        cpwd:''
+        pwd: '',
+        cpwd: ''
       },
-      rules:{
-        name:[{
-          required:true,type:'string',message:'请输入昵称',trigger:'blur'
+      rules: {
+        name: [{
+          required: true, type: 'string', message: '请输入昵称', trigger: 'blur'
         }],
-        email:[{
-          required:true,type:'email',message:'请输入邮箱',trigger:'blur'
+        email: [{
+          required: true, type: 'email', message: '请输入邮箱', trigger: 'blur'
         }],
-        pwd:[{
-          required:true,message:'创建密码',trigger:'blur'
+        pwd: [{
+          required: true, message: '创建密码', trigger: 'blur'
         }],
-        cpwd:[{
-          required:true,message:'确认密码',trigger:'blur'
-        },{
-          validator:(rule,value,callback) => {
-            if(value == ''){
+        cpwd: [{
+          required: true, message: '确认密码', trigger: 'blur'
+        }, {
+          validator: (rule, value, callback) => {
+            if (value == '') {
               callback(new Error('请再次输入密码'))
-            }else if(value != this.form.pwd){
+            } else if (value != this.form.pwd) {
               callback(new Error('两次输入密码不一致'))
-            }else{
+            } else {
               callback()
             }
           },
-          trigger:'blur'
+          trigger: 'blur'
         }],
       }
     }
@@ -92,9 +93,78 @@ export default {
     onSubmit() {
       console.log('submit!');
     },
-    sendMsg() {},
-    register() {
 
+    sendMsg() {
+      const self = this;
+      let namePass
+      let emailPass
+      if (self.timeid) {
+        return false
+      }
+      // 验证用户名有没有通过规则校验
+      this.$refs['form'].validateField('name', (valid) => {
+        namePass = valid
+      })
+      self.statusMsg = ''
+      if (namePass) {
+        return false
+      }
+      this.$refs['form'].validateField('email', (valid) => {
+        emailPass = valid
+      })
+      if (!namePass && !emailPass) {
+        self.$axios.post('/users/verity', {
+          // 对中文进行编码
+          username: encodeURIComponent(self.form.name),
+          email: self.form.email
+        }).then(({
+                   // 解构赋值
+                   status, data
+                 }) => {
+          if (status === 200 && data && data.code === 0) {
+            // 倒计时 60  timeid
+            let count = 60;
+            self.statusMsg = `验证码已发送，剩余${count--}秒`
+            self.timerid = setInterval(function () {
+              self.statusMsg = `验证码已发送，剩余${count--}秒`
+              if (count === 0) {
+                clearInterval(self.timerid)
+              }
+            }, 1000)
+          } else {
+            self.statusMsg = data.msg
+          }
+        })
+      }
+    },
+    // 验证
+    register() {
+        let self = this;
+        this.$refs['form'].validate((valid) =>{
+          if(valid){
+            self.$axios.post('/users/signup',{
+              username:window.encodeURIComponent(self.form.name),
+              // 加密密码 MD5的加密方式 MD5()返回的是数组，需要toString转化成字符串
+              password:CryptoJS.MD5(self.form.pwd).toString(),
+              email:self.form.email,
+              code:self.form.code
+            }).then(({status,data})=>{
+              if(status === 200){
+                if(data&&data.code === 0){
+                  location.href = '/login'
+                }else{
+                  self.error = data.msg
+                }
+              }else {
+                self.error = `服务器出错，错误码：${status}`
+              }
+              // 定时的清空error信息
+              setTimeout(function () {
+                self.error = ''
+              }, 1500)
+            })
+          }
+        })
     }
 
   }
@@ -102,5 +172,5 @@ export default {
 </script>
 
 <style lang="scss">
-@import "@/assets/css/register/index.scss";
+    @import "@/assets/css/register/index.scss";
 </style>
